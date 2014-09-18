@@ -1,4 +1,4 @@
-# jira-complete
+# vim-jira-complete
 
 `jira-complete` is a Vim plugin that queries JIRA issues and shows on AutoComplete list.
 
