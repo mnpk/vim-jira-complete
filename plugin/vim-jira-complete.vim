@@ -17,8 +17,8 @@ python << EOF
 import vim
 import json
 import requests
-url = vim.eval("g:jira_url") 
-user = vim.eval("g:jira_username")
+url = vim.eval("g:jiracomplete_url") 
+user = vim.eval("g:jiracomplete_username")
 query = "jql=assignee=%s+and+resolution=unresolved" % user
 api_url = "%s/rest/api/2/search?%s" % (url, query)
 issues = json.loads(requests.get(api_url).content)['issues']
