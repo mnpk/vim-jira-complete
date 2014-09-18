@@ -24,7 +24,7 @@ api_url = "%s/rest/api/2/search?%s" % (url, query)
 issues = json.loads(requests.get(api_url).content)['issues']
 match = []
 for issue in issues:
-  match.append("'<%s %s>'" % (issue['key'], issue['fields']['summary']))
+  match.append("'%s [%s] '" % (issue['key'], issue['fields']['summary']))
 command = "call complete(col('.'), [" + ','.join(match) + "])"
 vim.command(command)
 EOF
