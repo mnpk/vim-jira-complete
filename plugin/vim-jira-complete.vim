@@ -7,11 +7,11 @@ endif
 inoremap <F5> <C-R>=Jira()<CR>
 
 function! Jira()
-if !exists("g:jira_url")
-  return "Error: g:jira_url not exists"
+if !exists("g:jiracomplete_url")
+  return "Error: g:jiracomplete_url not exists"
 endif
-if !exists("g:jira_username")
-  return "Error: g:jira_username not exists"
+if !exists("g:jiracomplete_username")
+  return "Error: g:jiracomplete_username not exists"
 endif
 python << EOF
 import vim
