@@ -2,8 +2,7 @@
 
 `jira-complete` is a Vim plugin that queries JIRA issues and make a AutoComplete list for you. 
 
-This will be helpful if you are using Jira DVCS smart commits and [Fugitive.vim](https://github.com/tpope/vim-fugitive))
-
+This will be helpful if you are using Jira with DVCS smart commits and [Fugitive.vim](https://github.com/tpope/vim-fugitive)
 ## Demo
 
 ![demo](jira-complete-demo.gif)
