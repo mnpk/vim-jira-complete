@@ -3,6 +3,7 @@ if !has('python')
   finish
 endif
 
+
 inoremap <F5> <C-R>=Jira()<CR>
 
 function! Jira()
@@ -14,17 +15,17 @@ if !exists("g:jira_username")
 endif
 python << EOF
 import vim
-from jira.client import JIRA
-
+import json
+import requests
 url = vim.eval("g:jira_url") 
 user = vim.eval("g:jira_username")
-jira = JIRA(url)
-list = []
-for issue in jira.search_issues('assignee='+user+' AND resolution=unresolved'):
-  # vim.current.buffer.append("* %s %s" % (issue.key, issue.fields.summary))
-  list.append("'<%s %s>'" % (issue.key, issue.fields.summary))
-
-command = "call complete(col('.'), [" + ','.join(list) + "])"
+query = "jql=assignee=%s+and+resolution=unresolved" % user
+api_url = "%s/rest/api/2/search?%s" % (url, query)
+issues = json.loads(requests.get(api_url).content)['issues']
+match = []
+for issue in issues:
+  match.append("'<%s %s>'" % (issue['key'], issue['fields']['summary']))
+command = "call complete(col('.'), [" + ','.join(match) + "])"
 vim.command(command)
 EOF
 return ''
