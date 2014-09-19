@@ -13,9 +13,13 @@ This will be helpful if you are using Jira with DVCS smart commits and [Fugitive
 
 ## Installation
 
-Use [Vundle](https://github.com/gmarik/Vundle.vim).
+[Vundle](https://github.com/gmarik/Vundle.vim).
 
-or,
+```
+Plugin 'mnpk/vim-jira-complete'
+```
+
+or
 
 ```
 cd ~/.vim/bundle
