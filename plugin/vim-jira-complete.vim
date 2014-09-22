@@ -42,11 +42,14 @@ def jira_complete():
         command = "call complete(col('.'), [" + ','.join(match) + "])"
         vim.command(command)
     elif (response.status_code == requests.codes.unauthorized or
-            response.status_code == requests.codes.bad_request):
+            response.status_code == requests.codes.bad_request or
+            response.status_code == requests.codes.forbidden):
+        vim.command("echohl ErrorMsg")
         vim.command("call inputsave()")
         message = response.reason + "! Please input jira password for " + user
         vim.command("let password = input('"+message+": ')")
         vim.command('call inputrestore()')
+        vim.command("echohl None")
         pw = vim.eval('password')
         auth = base64.b64encode(user+':'+pw)
         vim.command("let b:jiracomplete_auth = '"+auth+"'")
