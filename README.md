@@ -41,4 +41,5 @@ in your .vimrc,
 ```
 let g:jiracomplete_url = 'http://your.jira.url/here/'
 let g:jiracomplete_username = 'your_jira_username'
+let b:jiracomplete_auth = $JIRA_PASS
 ```
