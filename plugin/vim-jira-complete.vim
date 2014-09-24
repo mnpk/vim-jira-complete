@@ -25,7 +25,8 @@ import base64
 def jira_complete():
     url = vim.eval("g:jiracomplete_url")
     user = vim.eval("g:jiracomplete_username")
-    auth = vim.eval("b:jiracomplete_auth")
+    pw = vim.eval("b:jiracomplete_auth")
+    auth = base64.b64encode(user+':'+pw)
     query = "jql=assignee=%s+and+resolution=unresolved" % user
     api_url = "%s/rest/api/2/search?%s" % (url, query)
     headers = {}
