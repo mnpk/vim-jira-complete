@@ -12,8 +12,8 @@ endif
 if !exists("g:jiracomplete_username")
   return "Error: g:jiracomplete_username not exists"
 endif
-if !exists("b:jiracomplete_auth")
-  let b:jiracomplete_auth=''
+if !exists("g:jiracomplete_password")
+  let g:jiracomplete_password=''
 endif
 
 python << EOF
@@ -25,12 +25,13 @@ import base64
 def jira_complete():
     url = vim.eval("g:jiracomplete_url")
     user = vim.eval("g:jiracomplete_username")
-    pw = vim.eval("b:jiracomplete_auth")
-    auth = base64.b64encode(user+':'+pw)
+    pw = vim.eval("g:jiracomplete_password")
     query = "jql=assignee=%s+and+resolution=unresolved" % user
     api_url = "%s/rest/api/2/search?%s" % (url, query)
     headers = {}
-    if auth:
+    if pw:
+        print(pw)
+        auth = base64.b64encode(user+':'+pw)
         headers['authorization'] = 'Basic ' + auth
     response = requests.get(api_url, headers=headers)
     if response.status_code == requests.codes.ok:
@@ -52,8 +53,7 @@ def jira_complete():
         vim.command('call inputrestore()')
         vim.command("echohl None")
         pw = vim.eval('password')
-        auth = base64.b64encode(user+':'+pw)
-        vim.command("let b:jiracomplete_auth = '"+auth+"'")
+        vim.command("let g:jiracomplete_password = '"+pw+"'")
         jira_complete()
     else:
         vim.command("return \" Error: " + response.reason + "\"")
