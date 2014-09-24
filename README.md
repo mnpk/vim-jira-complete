@@ -39,9 +39,7 @@ pip install requests
 in your .vimrc,
 
 ```
-" required
 let g:jiracomplete_url = 'http://your.jira.url/'
 let g:jiracomplete_username = 'your_jira_username'
-" optional: No need if your jira allows anyone to browse issues.
-let g:jiracomplete_password = 'your_jira_password'
+let g:jiracomplete_password = 'your_jira_password'  " optional
 ```
