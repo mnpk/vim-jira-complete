@@ -38,8 +38,8 @@ def jira_complete():
         issues = jvalue['issues']
         match = []
         for issue in issues:
-            match.append("{'word': '%s ', 'menu': '%s'}" %
-                (issue['key'], issue['fields']['summary']))
+            match.append("{\"word\": \"%s\", \"menu\": \"%s\"}" %
+                (issue['key'], issue['fields']['summary'].replace("\"", "\\\"")))
         command = "call complete(col('.'), [" + ','.join(match) + "])"
         vim.command(command)
     elif (response.status_code == requests.codes.unauthorized or
