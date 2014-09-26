@@ -30,7 +30,6 @@ def jira_complete():
     api_url = "%s/rest/api/2/search?%s" % (url, query)
     headers = {}
     if pw:
-        print(pw)
         auth = base64.b64encode(user+':'+pw)
         headers['authorization'] = 'Basic ' + auth
     response = requests.get(api_url, headers=headers)
@@ -49,7 +48,7 @@ def jira_complete():
         vim.command("echohl ErrorMsg")
         vim.command("call inputsave()")
         message = response.reason + "! Please input jira password for " + user
-        vim.command("let password = input('"+message+": ')")
+        vim.command("let password = inputsecret('"+message+": ')")
         vim.command('call inputrestore()')
         vim.command("echohl None")
         pw = vim.eval('password')
