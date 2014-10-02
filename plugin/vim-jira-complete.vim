@@ -22,7 +22,16 @@ import json
 import requests
 import base64
 
-def jira_complete():
+def get_password_for(user):
+    vim.command("echohl ErrorMsg")
+    vim.command("call inputsave()")
+    message = "Please input jira password for " + user
+    vim.command("let password = inputsecret('"+message+": ')")
+    vim.command('call inputrestore()')
+    vim.command("echohl None")
+    return vim.eval('password')
+
+def jira_complete(need_retry=True):
     url = vim.eval("g:jiracomplete_url")
     user = vim.eval("g:jiracomplete_username")
     pw = vim.eval("g:jiracomplete_password")
@@ -45,17 +54,14 @@ def jira_complete():
     elif (response.status_code == requests.codes.unauthorized or
             response.status_code == requests.codes.bad_request or
             response.status_code == requests.codes.forbidden):
-        vim.command("echohl ErrorMsg")
-        vim.command("call inputsave()")
-        message = response.reason + "! Please input jira password for " + user
-        vim.command("let password = inputsecret('"+message+": ')")
-        vim.command('call inputrestore()')
-        vim.command("echohl None")
-        pw = vim.eval('password')
-        vim.command("let g:jiracomplete_password = '"+pw+"'")
-        jira_complete()
+        if need_retry:
+            pw = get_password_for(user)
+            vim.command("let g:jiracomplete_password = '"+pw+"'")
+            jira_complete(need_retry=False)
+        else:
+            vim.command("return \"Error: " + response.reason + "\"")
     else:
-        vim.command("return \" Error: " + response.reason + "\"")
+        vim.command("return \"Error: " + response.reason + "\"")
 EOF
 py jira_complete()
 return ''
