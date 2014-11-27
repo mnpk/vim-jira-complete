@@ -47,6 +47,9 @@ endfunction
 " # Issues lists {{{2
 " Function: jira#_do_fetch_issues() {{{3
 function! jira#_do_fetch_issues() abort
+  if s:py_script_timestamp == 0
+    call jira#_init_python()
+  endif
   let url = lh#option#get('jiracomplete_url', '')
   if len(url) == 0
     throw "Error: [bg]:jiracomplete_url is not specified"
