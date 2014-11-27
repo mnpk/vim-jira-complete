@@ -30,11 +30,13 @@ set cpo&vim
 "------------------------------------------------------------------------
 " Commands and Mappings {{{1
 
-inoremap <silent> <Plug>JiraComplete <c-r>=jira#_complete()<cr>
+inoremap <silent> <Plug>JiraCompleteIgnoreCache <c-r>=jira#_complete(1)<cr>
+inoremap <silent> <Plug>JiraComplete            <c-r>=jira#_complete(0)<cr>
 if !hasmapto('<Plug>JiraComplete', 'i')
   imap <silent> <unique> <F5> <Plug>JiraComplete
 endif
-finish
+
+command! -nargs=0 JiraCompleteUpdateCache call jira#get_issues(1)
 " Commands and Mappings }}}1
 "------------------------------------------------------------------------
 let &cpo=s:cpo_save

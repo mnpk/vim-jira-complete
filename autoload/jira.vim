@@ -45,8 +45,8 @@ endfunction
 " ## Exported functions {{{1
 
 " # Issues lists {{{2
-" Function: jira#do_fetch_issues() {{{3
-function! jira#do_fetch_issues() abort
+" Function: jira#_do_fetch_issues() {{{3
+function! jira#_do_fetch_issues() abort
   let url = lh#option#get('jiracomplete_url', '')
   if len(url) == 0
     throw "Error: [bg]:jiracomplete_url is not specified"
@@ -64,10 +64,23 @@ function! jira#do_fetch_issues() abort
   endif
 endfunction
 
+" Function: jira#get_issues() {{{3
+" First from the cache, unless the cache is empty
+if !exists('s:cached_issues')
+  let s:cached_issues = []
+endif
+
+function! jira#get_issues(force_update) abort
+  if empty(s:cached_issues) || a:force_update
+    let s:cached_issues = jira#_do_fetch_issues()
+  endif
+  return s:cached_issues
+endfunction
+
 " # Completion {{{2
-" Function: jira#_complete() {{{3
+" Function: jira#_complete([force_update_cache]) {{{3
 function! jira#_complete(...) abort
-  let issues = jira#do_fetch_issues()
+  let issues = jira#get_issues(a:0 ? a:1 : 0)
   " Hint: let g:jiracomplete_format = 'v:val.abbr . " -> " . v:val.menu'
   let format = lh#option#get('jiracomplete_format', "v:val.abbr")
   call map(issues, "extend(v:val, {'word': ".format.'})')
