@@ -16,6 +16,9 @@ def get_password_for(user):
     return vim.eval('jira#_get_password("'+user+'")')
 
 def jira_complete(url, user, pw, need_retry=True):
+    # print "URL: ", url
+    # print "user: ", user
+    # print "pw: ", pw
     headers = {}
     if pw:
         auth = base64.b64encode(user+':'+pw)
@@ -24,17 +27,18 @@ def jira_complete(url, user, pw, need_retry=True):
     if type(url) == type(dict()):
         raw_url = url['url']
         api_url = "%s/rest/api/2/search?%s" % (raw_url, query)
-        url.pop('url')
-        for k in url.keys():
-            if url[k] == 'False' or url[k] == 'True':
-                url[k] = eval(url[k])
-        response = requests.get(api_url, headers=headers, **url)
+        args = url.copy()
+        args.pop('url')
+        for k in args.keys():
+            if args[k] == 'False' or args[k] == 'True':
+                args[k] = eval(args[k])
+        response = requests.get(api_url, headers=headers, **args)
     else:
         api_url = "%s/rest/api/2/search?%s" % (url, query)
         response = requests.get(api_url, headers=headers)
 
-    # print "api_url: ", api_url
-    # print "headers: ", headers
+    print "api_url: ", api_url
+    print "headers: ", headers
     if response.status_code == requests.codes.ok:
         jvalue = json.loads(response.content)
         issues = jvalue['issues']
