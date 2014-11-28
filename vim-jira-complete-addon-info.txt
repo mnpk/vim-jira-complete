@@ -1,0 +1,11 @@
+{
+    "name": "vim-jira-complete",
+        "version": "dev",
+        "author" : "mnpk, Luc Hermitte",
+        "maintainer" : "mnpk",
+        "repository" : {"type": "git", "url": "git@github.com:LucHermitte/vim-jira-complete"},
+        "dependencies" : {
+            "lh-vim-lib" : {"type" : "svn", "url" : "http://lh-vim.googlecode.com/svn/vim-lib/trunk"}
+        },
+        "description" : "Vim plugin that query JIRA Issues and make autocomplete"
+}
