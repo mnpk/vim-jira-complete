@@ -1,68 +1,45 @@
+"=============================================================================
+" $Id$
+" File:         plugin/vim-jira-complete.vim {{{1
+" Authors:
+"   mnpk <https://github.com/mnpk>, initial author of the plugin, 2014
+"   Luc Hermitte, enhancements to the plugin, 2014
+" Version:      0.2.0
+let s:k_version = 020
+"------------------------------------------------------------------------
+" Description:
+"       Autocomplete plugin from Jira issues.
+" }}}1
+"=============================================================================
+
 if !has('python')
   echo "Error: Required vim compiled with +python"
   finish
 endif
 
-inoremap <F5> <C-R>=Jira()<CR>
-
-function! Jira()
-if !exists("g:jiracomplete_url")
-  return "Error: g:jiracomplete_url not exists"
+" Avoid global reinclusion {{{1
+if &cp || (exists("g:loaded_vim_jira_complete")
+      \ && (g:loaded_vim_jira_complete >= s:k_version)
+      \ && !exists('g:force_reload_vim_jira_complete'))
+  finish
 endif
-if !exists("g:jiracomplete_username")
-  return "Error: g:jiracomplete_username not exists"
+let g:loaded_vim_jira_complete = s:k_version
+let s:cpo_save=&cpo
+set cpo&vim
+" Avoid global reinclusion }}}1
+"------------------------------------------------------------------------
+" Commands and Mappings {{{1
+
+inoremap <silent> <Plug>JiraCompleteIgnoreCache <c-r>=jira#_complete(1)<cr>
+inoremap <silent> <Plug>JiraComplete            <c-r>=jira#_complete(0)<cr>
+if !hasmapto('<Plug>JiraComplete', 'i')
+  imap <silent> <unique> <F5> <Plug>JiraComplete
 endif
-if !exists("g:jiracomplete_password")
-  let g:jiracomplete_password=''
-endif
 
-python << EOF
-import vim
-import json
-import requests
-import base64
+command! -nargs=0 JiraCompleteUpdateCache call jira#get_issues(1)
+" Commands and Mappings }}}1
+"------------------------------------------------------------------------
+let &cpo=s:cpo_save
+"=============================================================================
+" vim600: set fdm=marker:
 
-def get_password_for(user):
-    vim.command("echohl ErrorMsg")
-    vim.command("call inputsave()")
-    message = "Please input jira password for " + user
-    vim.command("let password = inputsecret('"+message+": ')")
-    vim.command('call inputrestore()')
-    vim.command("echohl None")
-    return vim.eval('password')
-
-def jira_complete(need_retry=True):
-    url = vim.eval("g:jiracomplete_url")
-    user = vim.eval("g:jiracomplete_username")
-    pw = vim.eval("g:jiracomplete_password")
-    query = "jql=assignee=%s+and+resolution=unresolved" % user
-    api_url = "%s/rest/api/2/search?%s" % (url, query)
-    headers = {}
-    if pw:
-        auth = base64.b64encode(user+':'+pw)
-        headers['authorization'] = 'Basic ' + auth
-    response = requests.get(api_url, headers=headers)
-    if response.status_code == requests.codes.ok:
-        jvalue = json.loads(response.content)
-        issues = jvalue['issues']
-        match = []
-        for issue in issues:
-            match.append("{\"word\": \"%s\", \"menu\": \"%s\"}" %
-                (issue['key'], issue['fields']['summary'].replace("\"", "\\\"")))
-        command = "call complete(col('.'), [" + ','.join(match) + "])"
-        vim.command(command)
-    elif (response.status_code == requests.codes.unauthorized or
-            response.status_code == requests.codes.bad_request or
-            response.status_code == requests.codes.forbidden):
-        if need_retry:
-            pw = get_password_for(user)
-            vim.command("let g:jiracomplete_password = '"+pw+"'")
-            jira_complete(need_retry=False)
-        else:
-            vim.command("return \"Error: " + response.reason + "\"")
-    else:
-        vim.command("return \"Error: " + response.reason + "\"")
-EOF
-py jira_complete()
-return ''
-endfunction
