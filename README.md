@@ -3,6 +3,7 @@
 `jira-complete` is a Vim plugin that queries JIRA issues and make a AutoComplete list for you.
 
 This will be helpful if you are using Jira with DVCS smart commits and [Fugitive.vim](https://github.com/tpope/vim-fugitive)
+
 ## Demo
 
 ![demo](jira-complete-demo.gif)
@@ -19,26 +20,32 @@ imap <silent> <unique> <leader>j <Plug>JiraComplete
 
 ## Installation
 
-If you are using [Vundle](https://github.com/gmarik/Vundle.vim),
+##### Vim-Plug (https://github.com/junegunn/vim-plug)
+
+```
+Plug 'mnpk/vim-jira-complete'
+```
+
+##### Vundle (https://github.com/gmarik/Vundle.vim)
 
 ```
 Plugin 'mnpk/vim-jira-complete'
 ```
 
-or
-
-```
-cd ~/.vim/bundle
-git clone git://github.com/mnpk/vim-jira-complete.git
-```
-
-If you are using VAM,
+##### VAM
 
 ```
 " For the official version
 InstallAddon mnpk/vim-jira-complete
-" For this particular fork
+" For Luc Hermitte's fork
 InstallAddon LucHermitte/vim-jira-complete
+```
+
+##### Manual Install
+
+```
+cd ~/.vim/bundle
+git clone git://github.com/mnpk/vim-jira-complete.git
 ```
 
 ## Dependency
@@ -48,8 +55,6 @@ Python support and [requests](http://docs.python-requests.org/) package.
 ```
 pip install requests
 ```
-
-It also requires [lh-vim-lib](http://code.google.com/p/lh-vim/wiki/lhVimLib).
 
 ## Settings
 
@@ -78,8 +83,16 @@ selected. If you also want the string, you can change the format with the
 option `[bg]:jiracomplete_format`:
 
 ```
-let b:jiracomplete_format = 'v:val.abbr . " -> " . v:val.menu'
+let g:jiracomplete_format = 'v:val.abbr . " -> " . v:val.menu'
 ```
+
+for `KEY-123 -> Your Issue Title`
+
+```
+let g:jiracomplete_format = '"[". v:val.abbr . "]"'
+```
+for `[KEY-123]`
+
 
 ### Certificates
 If the JIRA site is using a certificate that is not installed on your local
@@ -105,3 +118,5 @@ information on what you could do with it.
 vim-jira-complete has been initiated by mnpk.
 
 Luc Hermitte provided some enhancements.
+
+Using Luc Hermitte's Vim library [lh-vim-lib](http://code.google.com/p/lh-vim/wiki/lhVimLib).
