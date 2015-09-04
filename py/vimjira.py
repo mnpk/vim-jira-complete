@@ -26,8 +26,14 @@ def jira_complete(url, user, pw, need_retry=True):
     query = "jql=assignee=%s+and+resolution=unresolved" % user
     if type(url) == type(dict()):
         raw_url = url['url']
-        api_url = "%s/rest/api/2/search?%s" % (raw_url, query)
         args = url.copy()
+        if 'query' in url:
+            query = url['query']
+            args.pop('query')
+        if 'headers' in url and type(url['headers']) == type(dict()):
+            headers.update(url['headers'])
+            args.pop('headers')
+        api_url = "%s/rest/api/2/search?%s" % (raw_url, query)
         args.pop('url')
         for k in args.keys():
             if args[k] == 'False' or args[k] == 'True':
@@ -37,8 +43,6 @@ def jira_complete(url, user, pw, need_retry=True):
         api_url = "%s/rest/api/2/search?%s" % (url, query)
         response = requests.get(api_url, headers=headers)
 
-    print "api_url: ", api_url
-    print "headers: ", headers
     if response.status_code == requests.codes.ok:
         jvalue = json.loads(response.content)
         issues = jvalue['issues']
