@@ -12,8 +12,8 @@ let s:k_version = 020
 " }}}1
 "=============================================================================
 
-if !has('python')
-  echo "Error: Required vim compiled with +python"
+if !(has('python') || has('python3'))
+  echo "Error: Required vim compiled with +python or +python3"
   finish
 endif
 

@@ -41,6 +41,17 @@ function! jira#debug(expr)
   return eval(a:expr)
 endfunction
 
+" # Python version {{{2
+function! s:UsingPython2()
+  if has('python')
+    return 1
+  endif
+  return 0
+endfunction
+
+let s:using_python2 = s:UsingPython2()
+let s:python_command = s:using_python2 ? "python " : "python3 "
+let s:pyfile_command = s:using_python2 ? "pyfile": "py3file"
 
 "------------------------------------------------------------------------
 " ## lh functions {{{1
@@ -61,7 +72,7 @@ function! jira#lh_option_get(name,default,...)
       exe 'return '.scope[i].':'.name
     endif
     let i += 1
-  endwhile 
+  endwhile
   return a:default
 endfunction
 
@@ -71,7 +82,7 @@ function! jira#lh_common_warning_msg(text)
   " echomsg a:text
   call jira#lh_common_echomsg_multilines(a:text)
   echohl None
-endfunction 
+endfunction
 
 " Function: jira#lh_common_echomsg_multilines {{{2
 function! jira#lh_common_echomsg_multilines(text)
@@ -113,7 +124,7 @@ function! jira#_do_fetch_issues() abort
     throw "Error: [bg]:jiracomplete_username is not specified"
   endif
   let password = jira#_get_password(username)
-  py vim.command('let issues=['+jira_complete(vim.eval('url'), vim.eval('username'), vim.eval('password'))+']')
+  exec s:python_command "vim.command('let issues=['+jira_complete(vim.eval('url'), vim.eval('username'), vim.eval('password'))+']')"
   if len(issues) == 1 && type(issues[0])==type('')
     throw issues
   else
@@ -172,9 +183,9 @@ function! jira#_init_python() abort
   endif
   " jira_complete python part is expected to be already initialized
   call jira#verbose("Importing ".s:jirapy_script)
-  python import sys
-  exe 'python sys.path = ["' . s:plugin_root_path . '"] + sys.path'
-  exe 'pyfile ' . s:jirapy_script
+  exe s:python_command " import sys"
+  exe s:python_command 'sys.path = ["' . s:plugin_root_path . '"] + sys.path'
+  exe s:pyfile_command s:jirapy_script
   let s:py_script_timestamp = ts
 endfunction
 
