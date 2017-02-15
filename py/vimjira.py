@@ -11,15 +11,11 @@ import vim
 import json
 import requests
 import base64
-from six import print_
 
 def get_password_for(user):
     return vim.eval('jira#_get_password("'+user+'")')
 
 def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+resolution=unresolved"):
-    # print "URL: ", url
-    # print "user: ", user
-    # print "pw: ", pw
     headers = {}
     if pw:
         auth = base64.b64encode((user+':'+pw).encode())
@@ -38,8 +34,6 @@ def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+reso
         api_url = "%s/rest/api/2/search?%s" % (url, query)
         response = requests.get(api_url, headers=headers)
 
-    print_("api_url: ", api_url)
-    print_("headers: ", headers)
     if response.status_code == requests.codes.ok:
         jvalue = json.loads(response.content.decode())
         issues = jvalue['issues']
