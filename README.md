@@ -114,6 +114,22 @@ In other words, the URL can be a dictionary of options that'll be passed to
 _requests_ ` get()` function. Consult the relevant documentation for more
 information on what you could do with it.
 
+### Query
+By default, all unresolved issues assigned to the current user are shown.
+If you want to override this, you can specify a custom [jql
+query](https://confluence.atlassian.com/jiracoreserver073/advanced-searching-861257209.html) with the
+[bg]:jiracomplete_jql setting
+
+You can use "${user}" in the query as a placeholder for the currently logged in user.
+```
+let g:jiracomplete_jql = 'project=MYPROJ+and+resolution=unresolved'
+```
+to see all unresolved issues for project MYRPOJ
+```
+let g:jiracomplete_jql = 'project=MYPROJ+and+assignee=${user}'
+```
+to see all issues in project MYPROJ assigned to the current user
+
 ## Credits
 vim-jira-complete has been initiated by mnpk.
 

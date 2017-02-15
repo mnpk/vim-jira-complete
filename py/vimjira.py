@@ -16,7 +16,7 @@ from six import print_
 def get_password_for(user):
     return vim.eval('jira#_get_password("'+user+'")')
 
-def jira_complete(url, user, pw, need_retry=True):
+def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+resolution=unresolved"):
     # print "URL: ", url
     # print "user: ", user
     # print "pw: ", pw
@@ -24,7 +24,7 @@ def jira_complete(url, user, pw, need_retry=True):
     if pw:
         auth = base64.b64encode((user+':'+pw).encode())
         headers['authorization'] = 'Basic ' + auth.decode()
-    query = "jql=assignee=%s+and+resolution=unresolved" % user
+    query = "jql=%s" % jql.replace("${user}", user)
     if type(url) == type(dict()):
         raw_url = url['url']
         api_url = "%s/rest/api/2/search?%s" % (raw_url, query)
