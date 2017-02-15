@@ -6,14 +6,16 @@
 # Description:
 #       Internals and API functions for vim-jira-complete
 # }}}1
-#======================================================================
-import vim
+# ======================================================================
 import json
-import requests
 import base64
+import vim
+import requests
+
 
 def get_password_for(user):
     return vim.eval('jira#_get_password("'+user+'")')
+
 
 def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+resolution=unresolved"):
     headers = {}
@@ -21,7 +23,7 @@ def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+reso
         auth = base64.b64encode((user+':'+pw).encode())
         headers['authorization'] = 'Basic ' + auth.decode()
     query = "jql=%s" % jql.replace("${user}", user)
-    if type(url) == type(dict()):
+    if isinstance(url, dict):
         raw_url = url['url']
         api_url = "%s/rest/api/2/search?%s" % (raw_url, query)
         args = url.copy()
@@ -40,19 +42,19 @@ def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+reso
         match = []
         for issue in issues:
             match.append("{\"abbr\": \"%s\", \"menu\": \"%s\"}" %
-                (issue['key'], issue['fields']['summary'].replace("\"", "\\\"")))
+                         (issue['key'], issue['fields']['summary'].replace("\"", "\\\"")))
         return ','.join(match)
     elif (response.status_code == requests.codes.unauthorized or
-            response.status_code == requests.codes.bad_request or
-            response.status_code == requests.codes.forbidden):
+          response.status_code == requests.codes.bad_request or
+          response.status_code == requests.codes.forbidden):
         if need_retry:
             pw = get_password_for(user)
             return jira_complete(url, user, pw, need_retry=False, jql=jql)
         elif response.status_code == requests.codes.bad_request:
             jvalue = json.loads(response.content.decode())
-            errorMessages = jvalue['errorMessages']
+            error_messages = jvalue['errorMessages']
             match = []
-            for error in errorMessages:
+            for error in error_messages:
                 match.append(error)
             return '"%s: %s"' % (response.reason, ','.join(match))
         else:
