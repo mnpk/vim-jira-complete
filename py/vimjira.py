@@ -53,9 +53,15 @@ def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+reso
             response.status_code == requests.codes.forbidden):
         if need_retry:
             pw = get_password_for(user)
-            jira_complete(url, user, pw, need_retry=False)
+            return jira_complete(url, user, pw, need_retry=False, jql=jql)
+        elif response.status_code == requests.codes.bad_request:
+            jvalue = json.loads(response.content.decode())
+            errorMessages = jvalue['errorMessages']
+            match = []
+            for error in errorMessages:
+                match.append(error)
+            return '"%s: %s"' % (response.reason, ','.join(match))
         else:
-            return "Error: " + response.reason
+            return '"Error: %s"' % response.reason
     else:
-        return "Error: " + response.reason
-
+        return '"Error: %s"' % response.reason

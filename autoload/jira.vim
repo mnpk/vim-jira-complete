@@ -127,7 +127,7 @@ function! jira#_do_fetch_issues() abort
   let password = jira#_get_password(username)
   exec s:python_command "vim.command('let issues=['+jira_complete(vim.eval('url'), vim.eval('username'), vim.eval('password'), jql=vim.eval('jql'))+']')"
   if len(issues) == 1 && type(issues[0])==type('')
-    throw issues
+    throw issues[0]
   else
     return issues
   endif
