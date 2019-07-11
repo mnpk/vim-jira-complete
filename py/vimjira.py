@@ -6,25 +6,24 @@
 # Description:
 #       Internals and API functions for vim-jira-complete
 # }}}1
-#======================================================================
-import vim
+# ======================================================================
 import json
-import requests
 import base64
+import vim
+import requests
 
-def get_password_for(user):
-    return vim.eval('jira#_get_password("'+user+'")')
 
-def jira_complete(url, user, pw, need_retry=True):
-    # print "URL: ", url
-    # print "user: ", user
-    # print "pw: ", pw
+def get_token_for(user):
+    return vim.eval('jira#_get_token("'+user+'")')
+
+
+def jira_complete(url, user, token, need_retry=True, jql="assignee=${user}+and+resolution=unresolved"):
     headers = {}
-    if pw:
-        auth = base64.b64encode(user+':'+pw)
-        headers['authorization'] = 'Basic ' + auth
-    query = "jql=assignee=%s+and+resolution=unresolved" % user
-    if type(url) == type(dict()):
+    if token:
+        auth = base64.b64encode((user+':'+token).encode())
+        headers['authorization'] = 'Basic ' + auth.decode()
+    query = "jql=%s" % jql.replace("${user}", "currentuser()")
+    if isinstance(url, dict):
         raw_url = url['url']
         api_url = "%s/rest/api/2/search?%s" % (raw_url, query)
         args = url.copy()
@@ -37,24 +36,28 @@ def jira_complete(url, user, pw, need_retry=True):
         api_url = "%s/rest/api/2/search?%s" % (url, query)
         response = requests.get(api_url, headers=headers)
 
-    print "api_url: ", api_url
-    print "headers: ", headers
     if response.status_code == requests.codes.ok:
-        jvalue = json.loads(response.content)
+        jvalue = json.loads(response.content.decode())
         issues = jvalue['issues']
         match = []
         for issue in issues:
             match.append("{\"abbr\": \"%s\", \"menu\": \"%s\"}" %
-                (issue['key'], issue['fields']['summary'].replace("\"", "\\\"")))
+                         (issue['key'], issue['fields']['summary'].replace("\"", "\\\"")))
         return ','.join(match)
     elif (response.status_code == requests.codes.unauthorized or
-            response.status_code == requests.codes.bad_request or
-            response.status_code == requests.codes.forbidden):
+          response.status_code == requests.codes.bad_request or
+          response.status_code == requests.codes.forbidden):
         if need_retry:
-            pw = get_password_for(user)
-            jira_complete(url, user, pw, need_retry=False)
+            token = get_token_for(user)
+            return jira_complete(url, user, token, need_retry=False, jql=jql)
+        elif response.status_code == requests.codes.bad_request:
+            jvalue = json.loads(response.content.decode())
+            error_messages = jvalue['errorMessages']
+            match = []
+            for error in error_messages:
+                match.append(error)
+            return '"%s: %s"' % (response.reason, ','.join(match))
         else:
-            return "Error: " + response.reason
+            return '"Error: %s"' % response.reason
     else:
-        return "Error: " + response.reason
-
+        return '"Error: %s"' % response.reason

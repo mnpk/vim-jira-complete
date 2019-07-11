@@ -12,20 +12,20 @@ let s:k_version = 020
 " }}}1
 "=============================================================================
 
-if !has('python')
-  echo "Error: Required vim compiled with +python"
+if !(has('python') || has('python3'))
+  echo 'Error: Required vim compiled with +python or +python3'
   finish
 endif
 
 " Avoid global reinclusion {{{1
-if &cp || (exists("g:loaded_vim_jira_complete")
+if &compatible || (exists('g:loaded_vim_jira_complete')
       \ && (g:loaded_vim_jira_complete >= s:k_version)
       \ && !exists('g:force_reload_vim_jira_complete'))
   finish
 endif
 let g:loaded_vim_jira_complete = s:k_version
-let s:cpo_save=&cpo
-set cpo&vim
+let s:cpo_save=&cpoptions
+set cpoptions&vim
 " Avoid global reinclusion }}}1
 "------------------------------------------------------------------------
 " Commands and Mappings {{{1
@@ -39,7 +39,7 @@ endif
 command! -nargs=0 JiraCompleteUpdateCache call jira#get_issues(1)
 " Commands and Mappings }}}1
 "------------------------------------------------------------------------
-let &cpo=s:cpo_save
+let &cpoptions=s:cpo_save
 "=============================================================================
 " vim600: set fdm=marker:
 
