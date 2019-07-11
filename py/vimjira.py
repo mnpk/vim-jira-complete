@@ -22,7 +22,8 @@ def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+reso
     if pw:
         auth = base64.b64encode((user+':'+pw).encode())
         headers['authorization'] = 'Basic ' + auth.decode()
-    query = "jql=%s" % jql.replace("${user}", user)
+    query = "jql=%s" % jql.replace("${user}", "currentuser()")
+    print(query)
     if isinstance(url, dict):
         raw_url = url['url']
         api_url = "%s/rest/api/2/search?%s" % (raw_url, query)
