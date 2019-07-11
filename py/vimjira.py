@@ -13,14 +13,14 @@ import vim
 import requests
 
 
-def get_password_for(user):
-    return vim.eval('jira#_get_password("'+user+'")')
+def get_token_for(user):
+    return vim.eval('jira#_get_token("'+user+'")')
 
 
-def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+resolution=unresolved"):
+def jira_complete(url, user, token, need_retry=True, jql="assignee=${user}+and+resolution=unresolved"):
     headers = {}
-    if pw:
-        auth = base64.b64encode((user+':'+pw).encode())
+    if token:
+        auth = base64.b64encode((user+':'+token).encode())
         headers['authorization'] = 'Basic ' + auth.decode()
     query = "jql=%s" % jql.replace("${user}", "currentuser()")
     print(query)
@@ -49,8 +49,8 @@ def jira_complete(url, user, pw, need_retry=True, jql="assignee=${user}+and+reso
           response.status_code == requests.codes.bad_request or
           response.status_code == requests.codes.forbidden):
         if need_retry:
-            pw = get_password_for(user)
-            return jira_complete(url, user, pw, need_retry=False, jql=jql)
+            token = get_token_for(user)
+            return jira_complete(url, user, token, need_retry=False, jql=jql)
         elif response.status_code == requests.codes.bad_request:
             jvalue = json.loads(response.content.decode())
             error_messages = jvalue['errorMessages']

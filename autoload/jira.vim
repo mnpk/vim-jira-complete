@@ -5,8 +5,9 @@
 "   mnpk <https://github.com/mnpk>, initial author of the plugin, 2014
 "   Luc Hermitte, enhancements to the plugin, 2014
 "   jira#lh_... functions are copied from Luc Hermitte's vim library [lh-vim-lib](http://code.google.com/p/lh-vim/wiki/lhVimLib).
-" Version:      0.2.0
-let s:k_version = 020
+"   Bart Libert, enhancements, 2018-2019
+" Version:      0.3.0
+let s:k_version = 030
 "------------------------------------------------------------------------
 " Description:
 "       Internals and API functions for vim-jira-complete
@@ -119,14 +120,14 @@ function! jira#_do_fetch_issues() abort
   if len(l:url) == 0
     throw 'Error: [bg]:jiracomplete_url is not specified'
   endif
-  let l:username = jira#lh_option_get('jiracomplete_username', '')
-  if len(l:username) == 0
-    throw 'Error: [bg]:jiracomplete_username is not specified'
+  let l:email = jira#lh_option_get('jiracomplete_email', '')
+  if len(l:email) == 0
+    throw 'Error: [bg]:jiracomplete_email is not specified'
   endif
   let l:jql = jira#lh_option_get('jiracomplete_jql', 'assignee=${user}+and+resolution=unresolved')
-  let l:password = jira#_get_password(l:username)
+  let l:token = jira#_get_token(l:email)
   let l:issues = ['Python query was not executed']
-  exec s:python_command "vim.command('let l:issues=['+jira_complete(vim.eval('url'), vim.eval('username'), vim.eval('password'), jql=vim.eval('jql'))+']')"
+  exec s:python_command "vim.command('let l:issues=['+jira_complete(vim.eval('url'), vim.eval('email'), vim.eval('token'), jql=vim.eval('jql'))+']')"
   if len(l:issues) == 1 && type(l:issues[0])==type('')
     throw l:issues[0]
   else
@@ -193,17 +194,17 @@ endfunction
 
 " # Options related functions {{{2
 " Function: jira#_get_password() {{{3
-function! jira#_get_password(username) abort
-  let l:password = jira#lh_option_get('jiracomplete_password', '')
-  if len(l:password) == 0
+function! jira#_get_token(email) abort
+  let l:token = jira#lh_option_get('jiracomplete_token', '')
+  if len(l:token) == 0
     call inputsave()
-    let l:password = inputsecret('Please input jira password for '.a:username.': ')
-    " The password is voluntarilly not cached in case the end user wants to
+    let l:otken = inputsecret('Please input jira token for '.a:email.': ')
+    " The token is voluntarilly not cached in case the end user wants to
     " keep its privacy
     call inputrestore()
     echohl None
   endif
-  return l:password
+  return l:token
 endfunction
 
 "------------------------------------------------------------------------

@@ -63,8 +63,8 @@ The settings can be global, for instance, write in your `.vimrc`:
 
 ```
 let g:jiracomplete_url = 'http://your.jira.url/'
-let g:jiracomplete_username = 'your_jira_username'
-let g:jiracomplete_password = 'your_jira_password'  " optional
+let g:jiracomplete_email = 'your_jira_email'
+let g:jiracomplete_token = 'your_jira_token'
 ```
 
 or settings can be [local to a project](https://github.com/LucHermitte/local_vimrc)
@@ -72,8 +72,8 @@ or settings can be [local to a project](https://github.com/LucHermitte/local_vim
 
 ```
 let b:jiracomplete_url = 'http://your.jira.url/'
-let b:jiracomplete_username = 'your_jira_username'
-let b:jiracomplete_password = 'your_jira_password'  " optional
+let b:jiracomplete_email = 'your_jira_username'
+let b:jiracomplete_token = 'your_jira_token'
 ```
 
 ### Format of the string inserted
